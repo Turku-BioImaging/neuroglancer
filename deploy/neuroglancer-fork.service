@@ -1,0 +1,14 @@
+# Install on the server:
+#   sudo cp neuroglancer-fork.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+[Unit]
+Description=Neuroglancer (fork) static server
+After=network.target
+
+[Service]
+User=www-data
+ExecStart=/usr/bin/python3 -m http.server 8081 --bind 127.0.0.1 --directory /opt/neuroglancer-fork/dist/client
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
