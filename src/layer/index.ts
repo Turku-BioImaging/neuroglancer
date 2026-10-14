@@ -44,6 +44,8 @@ import {
   layerDataSourceSpecificationFromJson,
 } from "#src/layer/layer_data_source.js";
 import { createImageLayerAsMultiChannel } from "#src/layer/multi_channel_setup.js";
+import type { VisibleAt } from "#src/layer/visible_at.js";
+import { parseVisibleAt } from "#src/layer/visible_at.js";
 import type {
   DisplayDimensions,
   WatchableDisplayDimensionRenderInfo,
@@ -732,6 +734,12 @@ export class ManagedUserLayer extends RefCounted {
   visible = true;
   archived = false;
 
+  /**
+   * If specified, the layer is shown only while the global position along each listed dimension is
+   * within the given voxel.  Kept in sync with the viewer position by `updateVisibleAtLayers`.
+   */
+  visibleAt: VisibleAt | undefined;
+
   get supportsPickOption() {
     const userLayer = this.layer;
     return (
@@ -812,6 +820,9 @@ export class ManagedUserLayer extends RefCounted {
       } else {
         layerSpec.visible = false;
       }
+    }
+    if (this.visibleAt !== undefined) {
+      layerSpec.visibleAt = { ...this.visibleAt };
     }
     return layerSpec;
   }
@@ -2068,6 +2079,7 @@ function initializeLayerFromSpecNoRestoreState(
   } else {
     managedLayer.visible = false;
   }
+  managedLayer.visibleAt = parseVisibleAt(spec.visibleAt);
   const layerConstructor = layerTypes.get(layerType) || NewUserLayer;
   managedLayer.layer = new layerConstructor(managedLayer);
   return spec;

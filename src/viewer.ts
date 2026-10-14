@@ -53,6 +53,7 @@ import {
   TrackableDataSelectionState,
   UserLayer,
 } from "#src/layer/index.js";
+import { updateVisibleAtLayers } from "#src/layer/visible_at.js";
 import { LayerGroupViewer } from "#src/layer_group_viewer.js";
 import { RootLayoutContainer } from "#src/layer_groups_layout.js";
 import {
@@ -745,6 +746,19 @@ export class Viewer extends RefCounted implements ViewerState {
     );
     this.layerManager.layersChanged.add(maybeResetState);
     maybeResetState();
+
+    // Show layers that have `visibleAt` only at their position, e.g. one layer per timepoint.
+    const updateVisibleAt = () => {
+      updateVisibleAtLayers(
+        this.layerManager.managedLayers,
+        this.coordinateSpace.value,
+        this.position.value,
+      );
+    };
+    this.registerDisposer(this.position.changed.add(updateVisibleAt));
+    this.registerDisposer(this.layerManager.layersChanged.add(updateVisibleAt));
+    this.registerDisposer(this.coordinateSpace.changed.add(updateVisibleAt));
+    updateVisibleAt();
 
     this.registerDisposer(
       this.dataContext.chunkQueueManager.visibleChunksChanged.add(() => {
