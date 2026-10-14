@@ -86,7 +86,7 @@ export function isVisibleAtPosition(
 export interface VisibleAtLayer {
   visibleAt: VisibleAt | undefined;
   archived: boolean;
-  setVisible(value: boolean): void;
+  setVisibleAtMatch(match: boolean): void;
 }
 
 /**
@@ -101,6 +101,8 @@ export function updateVisibleAtLayers(
   for (const layer of layers) {
     const { visibleAt } = layer;
     if (visibleAt === undefined || layer.archived) continue;
-    layer.setVisible(isVisibleAtPosition(visibleAt, coordinateSpace, position));
+    layer.setVisibleAtMatch(
+      isVisibleAtPosition(visibleAt, coordinateSpace, position),
+    );
   }
 }

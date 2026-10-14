@@ -740,6 +740,12 @@ export class ManagedUserLayer extends RefCounted {
    */
   visibleAt: VisibleAt | undefined;
 
+  /**
+   * True while `visibleAt` is specified and does not match the current position.  The layer is
+   * hidden and omitted from the layer bar.  Not serialized.
+   */
+  visibleAtMismatch = false;
+
   get supportsPickOption() {
     const userLayer = this.layer;
     return (
@@ -836,6 +842,21 @@ export class ManagedUserLayer extends RefCounted {
     }
     this.visible = value;
     this.layerChanged.dispatch();
+  }
+
+  /**
+   * Called by `updateVisibleAtLayers` to show the layer when its `visibleAt` matches the current
+   * position, and to hide it, and omit it from the layer bar, when it does not.
+   */
+  setVisibleAtMatch(match: boolean) {
+    const mismatch = !match;
+    const mismatchChanged = this.visibleAtMismatch !== mismatch;
+    this.visibleAtMismatch = mismatch;
+    const { visible } = this;
+    this.setVisible(match);
+    if (mismatchChanged && this.visible === visible) {
+      this.layerChanged.dispatch();
+    }
   }
 
   setArchived(value: boolean) {

@@ -122,12 +122,14 @@ describe("updateVisibleAtLayers", () => {
     visible = true,
     archived = false,
   ) {
-    const layer: VisibleAtLayer & { visible: boolean } = {
+    const layer: VisibleAtLayer & { visible: boolean; listed: boolean } = {
       visibleAt,
       archived,
       visible,
-      setVisible(value: boolean) {
-        layer.visible = value;
+      listed: true,
+      setVisibleAtMatch(match: boolean) {
+        layer.visible = match;
+        layer.listed = match;
       },
     };
     return layer;
@@ -138,6 +140,7 @@ describe("updateVisibleAtLayers", () => {
     const layers = [0, 1, 2].map((t) => makeLayer({ t }));
     updateVisibleAtLayers(layers, space, Float32Array.of(1, 0));
     expect(layers.map((l) => l.visible)).toEqual([false, true, false]);
+    expect(layers.map((l) => l.listed)).toEqual([false, true, false]);
     updateVisibleAtLayers(layers, space, Float32Array.of(2, 0));
     expect(layers.map((l) => l.visible)).toEqual([false, false, true]);
   });

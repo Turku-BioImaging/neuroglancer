@@ -495,6 +495,8 @@ export class LayerBar extends RefCounted {
     this.manager.rootLayers.updateNonArchivedLayerIndices();
     for (const layer of this.manager.layerManager.managedLayers) {
       if (layer.archived && !this.dropLayers?.layers.has(layer)) continue;
+      // Layers that are linked to another position by `visibleAt` are only listed while shown.
+      if (layer.visibleAtMismatch) continue;
       layers.add(layer);
       let widget = this.layerWidgets.get(layer);
       const layerIndex = layer.nonArchivedLayerIndex;
